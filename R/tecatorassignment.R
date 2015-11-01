@@ -1,7 +1,7 @@
 library(XLConnect)
 library(glmnet)
 
-#hehehe
+#hehehehe
 #FROM THIS FILE LOCATION, EXCEL FILES SHOULD BE FOUND IN A SUBFOLDER IN THIS FILE LOCATION CALLED DATA
 wb = loadWorkbook("data/tecator.xlsx")
 data2 = readWorksheet(wb, sheet = "data", header = TRUE)
