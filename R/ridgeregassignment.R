@@ -28,13 +28,18 @@ Ridgeregression <- function(X,Y,Lambda,Nfolds){
   
   for(j in 1:n){
     Xjth <- as.matrix(X[-test_index[[j]],])
-    Yjth <- as.matrix(Y[-test_index[[j]]])
+    Xjthcenter <- colMeans(Xjth)
+    Xjth <- Xjth - matrix(rep(Xjthcenter,nrow(Xjth)),ncol = ncol(Xjth), byrow=TRUE)
     
+    Yjth <- as.matrix(Y[-test_index[[j]]])
+    Yjthcenter <- colMeans(Yjth)
+    Yjth <- Yjth - Yjthcenter
     w_ridge <- solve(t(Xjth) %*% Xjth + Lambda * diag(ncol(Xjth))) %*% t(Xjth) %*% Yjth
     
-    jth_pred <- as.matrix(X[test_index[[j]],]) %*% w_ridge
-    
-    loss <- (Y[test_index[[j]]] - jth_pred)^2 
+    jth_pred <- (as.matrix(X[test_index[[j]],]) -
+                   matrix(rep(Xjthcenter,nrow(X[test_index[[j]],])),ncol = ncol(Xjth), byrow=TRUE))  %*% w_ridge
+   
+    loss <- (Y[test_index[[j]]] - Yjthcenter - jth_pred)^2 
     
     loss_sum <- sum(loss)
     
@@ -47,8 +52,10 @@ Ridgeregression <- function(X,Y,Lambda,Nfolds){
 
 
 scores <- c()
-for(lambda in seq(from=0, to=3000, by=50)){
+for(lambda in seq(from=1, to=7, by=1)){
   scores <- c(scores,Ridgeregression(data[,1:6],data$Employed,lambda,10))
   
 }
 which.min(scores)
+plot(scores,type="l",ylab="CV-scores",xlab=expression(lambda),
+     main=c("CV-score vs",expression(lambda), "value"))
