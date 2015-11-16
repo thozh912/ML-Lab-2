@@ -1,13 +1,13 @@
 library(tree)
 library(boot)
-data <-read.csv2("D:/R_HW/ML-Lab-2/data/State.csv")
+data <-read.csv2("C:/Users/Dator/Documents/R_HW/ML-Lab-2/data/State.csv")
 data <- data[order(data$MET),]
 plot(data$MET,data$EX, main=c("per capita State and local expenditures ($)",
                               "vs percentage of people living in metropolitan areas"),
 ylab="$ expenditures per capita",
 xlab="percentage of people in metropolitan areas",pch="+")
 
-regtree <- tree(data$EX ~ data$MET,data, control = tree.control(48,minsize=2))
+regtree <- tree(EX ~ MET,data, control = tree.control(48,minsize=2))
 set.seed(12345)
 cvresult <- cv.tree(regtree)
 # best result at size = 3
@@ -36,12 +36,13 @@ legend(x=20,y=400,c("original values","fitted values"),
 
 f <- function(datainp,ind){
   data1 <- datainp[ind,]
-  res <- tree(data1$EX ~ data1$MET,data1, control = tree.control(dim(data1)[1],minsize=2))
+  res <- tree(EX ~ MET,data1, control = tree.control(dim(data1)[1],minsize=2))
   bestrestree <- prune.tree(res,best=3)
   predictions <- predict(bestrestree, newdata=data)
   return(predictions)
 }
 
+set.seed(12345)
 bootobj1 <- boot(data,f, R=1000)
 confintvs <- envelope(bootobj1)
 #plot(bootobj1)
@@ -67,22 +68,24 @@ rng <- function(data2,mle){
 }
 
 f1 = function(data1){
-  res <- tree(data1$EX ~ data1$MET,data1, control = tree.control(dim(data1)[1],minsize=2))
+  res <- tree(EX ~ MET,data1, control = tree.control(dim(data1)[1],minsize=2))
   bestrestree <- prune.tree(res,best=3)
   expenditures <- predict(bestrestree, newdata=data)
   return(expenditures)
 }
 
 f2 = function(data1){
-  res <- tree(data1$EX ~ data1$MET,data1, control = tree.control(dim(data1)[1],minsize=2))
+  res <- tree(EX ~ MET,data1, control = tree.control(dim(data1)[1],minsize=2))
   bestrestree <- prune.tree(res,best=3)
   expenditures <- rnorm(dim(data)[1],predict(bestrestree, newdata=data),
                         sd(resid))
   return(expenditures)
 }
+
+set.seed(12345)
 bootobj2 <- boot(data, statistic= f1,R=1000,
                  mle=bestregtree,ran.gen=rng,sim="parametric")
-
+set.seed(12345)
 bootobj3 <- boot(data,statistic= f2,R=1000,
                  mle=bestregtree,ran.gen=rng,sim="parametric")
 #plot(bootobj2)
