@@ -42,7 +42,6 @@ legend("top",c(expression(paste(lambda," = 0.3")),
      
 lines(seq(-1,1,0.01),uband,col="red",lty=2)
 lines(seq(-1,1,0.01),lband,col="red",lty=2)
-
 ctask <- posteriorGP(c(0.4,-0.6),c(0.719,0.044),seq(-1,1,0.01),c(1, 0.3),0.1)
 uband2 <- ctask$posteriorMean + 2 * sqrt(diag(ctask$posteriorCov))
 lband2 <- ctask$posteriorMean - 2 * sqrt(diag(ctask$posteriorCov))
@@ -55,10 +54,8 @@ legend("top",c(expression(paste(lambda," = 0.3")),
                expression(paste(sigma[n]," = 0.1"))),bty="n")
 lines(seq(-1,1,0.01),uband2,col="red",lty=2)
 lines(seq(-1,1,0.01),lband2,col="red",lty=2)
-
 yvec <- c(0.768,-0.044,-0.940,0.719,-0.664)
 xvec <- c(-1,-.6,-.2,.4,.8)
-
 dtask <- posteriorGP(xvec,yvec,seq(-1,1,0.01),c(1, 0.3),0.1)
 uband3 <- dtask$posteriorMean + 2 * sqrt(diag(dtask$posteriorCov))
 lband3 <- dtask$posteriorMean - 2 * sqrt(diag(dtask$posteriorCov))
@@ -124,3 +121,16 @@ points(data$time,data$temp,pch="+",col="gray",cex=0.6)
 legend("topleft",c(expression(paste(lambda," = 1")),
                    expression(paste(sigma[f]," = 1")),
                    expression(paste(sigma[n]," = 1"))),bty="n")
+
+jtask <- posteriorGP(data$time,data$temp,seq(0,1,0.01),c(0.05, 1),1)
+
+plot(seq(0,1,0.01),jtask$posteriorMean,type="l", ylim = c(10,35),
+     main=c("Gaussian Process Regression","Japan temperature over a year"
+     ),ylab="mean temp (posterior distribution)",
+     xlab="time fraction of full year")
+points(data$time,data$temp,pch="+",col="gray",cex=0.6)
+legend("topleft",c(expression(paste(lambda," = 1")),
+                   expression(paste(sigma[f]," = 0.05")),
+                   expression(paste(sigma[n]," = 1"))),bty="n")
+
+## NA

@@ -1,3 +1,23 @@
+---
+title: "Computer Lab 6"
+author: "Thomas Zhang"
+date: "`r Sys.Date()`"
+output: 
+  pdf_document: 
+    fig_height: 4
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+##Assignment 1
+
+We wish to perform Gaussian Process Regression starting with a constant zero function with normally distributed noise with variance $\sigma^2_{n}$.
+
+We create a function for simulating from the posterior distribution of $f(x)$ using the squared exponential kernel with variance parameter $\sigma^2_{f}$ and bandwidth parameter $\lambda$. We update the zero mean prior with one observation, $(0.4, 0.719)$, and plot the posterior mean over the interval $(-1,1)$ together with 95% pointwise probability bands for $f$.
+
+```{r,echo=FALSE,message=FALSE}
 library(MASS)
 
 www = "D:/R_HW/ML-Lab-2/data/JapanTemp.dat"
@@ -42,7 +62,12 @@ legend("top",c(expression(paste(lambda," = 0.3")),
      
 lines(seq(-1,1,0.01),uband,col="red",lty=2)
 lines(seq(-1,1,0.01),lband,col="red",lty=2)
+```
 
+We now add one observation, (-0.6,-0.044) and run the Gaussian Process Regression again and plot the correspoinding out put again.
+
+
+```{r, echo=FALSE}
 ctask <- posteriorGP(c(0.4,-0.6),c(0.719,0.044),seq(-1,1,0.01),c(1, 0.3),0.1)
 uband2 <- ctask$posteriorMean + 2 * sqrt(diag(ctask$posteriorCov))
 lband2 <- ctask$posteriorMean - 2 * sqrt(diag(ctask$posteriorCov))
@@ -55,10 +80,15 @@ legend("top",c(expression(paste(lambda," = 0.3")),
                expression(paste(sigma[n]," = 0.1"))),bty="n")
 lines(seq(-1,1,0.01),uband2,col="red",lty=2)
 lines(seq(-1,1,0.01),lband2,col="red",lty=2)
+```
 
+We see that the probability bands become narrow around the observations. This is characteristic of Gaussian process regression.
+
+We now compute the posterior distribution for five points, given in the lab instructions. Let us do it one time for $\lambda = 0.3$ and one time for $\lambda = 1$.
+
+```{r,echo=FALSE}
 yvec <- c(0.768,-0.044,-0.940,0.719,-0.664)
 xvec <- c(-1,-.6,-.2,.4,.8)
-
 dtask <- posteriorGP(xvec,yvec,seq(-1,1,0.01),c(1, 0.3),0.1)
 uband3 <- dtask$posteriorMean + 2 * sqrt(diag(dtask$posteriorCov))
 lband3 <- dtask$posteriorMean - 2 * sqrt(diag(dtask$posteriorCov))
@@ -85,6 +115,13 @@ legend("top",c(expression(paste(lambda," = 1")),
 lines(seq(-1,1,0.01),uband4,col="red",lty=2)
 lines(seq(-1,1,0.01),lband4,col="red",lty=2)
 
+```
+
+It is observed that a longer kernel bandwidth gives a smoother function and more narrow 95% pointwise probability bands for $f$.
+
+Let us now try this Gaussian Process Regression on a data set containing daily temperatures somewhere in Japan over a year. The probability bands will not be plotted since they will almost coincide with the posterior mean due to the number of data points.
+
+```{r,echo=FALSE}
 jtask <- posteriorGP(data$time,data$temp,seq(0,1,0.01),c(1, 1),0.1)
 ubandj <- jtask$posteriorMean + 2 * sqrt(diag(jtask$posteriorCov))
 lbandj <- jtask$posteriorMean - 2 * sqrt(diag(jtask$posteriorCov))
@@ -124,3 +161,24 @@ points(data$time,data$temp,pch="+",col="gray",cex=0.6)
 legend("topleft",c(expression(paste(lambda," = 1")),
                    expression(paste(sigma[f]," = 1")),
                    expression(paste(sigma[n]," = 1"))),bty="n")
+
+jtask <- posteriorGP(data$time,data$temp,seq(0,1,0.01),c(0.05, 1),1)
+
+plot(seq(0,1,0.01),jtask$posteriorMean,type="l", ylim = c(10,35),
+     main=c("Gaussian Process Regression","Japan temperature over a year"
+     ),ylab="mean temp (posterior distribution)",
+     xlab="time fraction of full year")
+points(data$time,data$temp,pch="+",col="gray",cex=0.6)
+legend("topleft",c(expression(paste(lambda," = 1")),
+                   expression(paste(sigma[f]," = 0.05")),
+                   expression(paste(sigma[n]," = 1"))),bty="n")
+
+```
+
+When $\sigma^2_{n}$ is increased, a less precise fit is obtained, since it is then assumed that the data is then more capable of being noisy. When $\lambda$ is decreased, the fit becomes more overfitted to the data. This seems to be beneficial in this case. When $\sigma^2_{f}$ is decreased The function posterior mean becomes flatter, and more incapable of modeling the data.
+
+
+##Appendix
+
+###R code
+```{r code=readLines(knitr::purl("D:/R_HW/ML-Lab-2/vignettes/ComputerLab6.Rmd", documentation = 0)), eval = FALSE}
