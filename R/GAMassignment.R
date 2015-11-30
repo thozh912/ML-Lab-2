@@ -54,9 +54,9 @@ points(data$Time,gam_mort$residuals,col="red")
 legend("topleft",legend=c("influenza cases","Residual of GAM fit"),
        pch=c("o","o"),col=c("black","red"))
 
-gam_mort4 <- gam(formula=Mortality ~ s(Week, k=5) + s(Year, k=3) + s(Influenza, k=4), data=data)
+gam_mort4 <- gam(formula=Mortality ~ s(Week, k=5) + s(Influenza, k=4), data=data)
 
-par(mfrow=c(1,3)) 
+par(mfrow=c(1,2)) 
 plot(gam_mort4) 
 par(mfrow=c(1,1)) 
 
