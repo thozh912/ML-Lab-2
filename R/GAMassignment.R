@@ -24,7 +24,7 @@ summary(gam_mort)
 plot(data$Mortality,type="l",
      main=c("Weekly Mortality in Sweden vs year with GAM fit",
             "linear component for year,spline function for week"),
-     xlab="# weeks after week 52 1994",ylab="Mortality"))
+     xlab="# weeks after week 52 1994",ylab="Mortality")
 lines(gam_mort$fitted.values,col="red")
 
 plot(gam_mort, main="Week spline component over a year")
@@ -68,5 +68,5 @@ plot(data$Mortality,type="l",
      xlab="# weeks after week 52 1994",ylab="Mortality")
 lines(gam_mort4$fitted.values, col="red") 
 
-sse <- sum((data$Mortality-gam_mort4$fitted.values)^2)/nrow(data)
-paste("MSE for best GAM fit:",round(sse,0))
+sse <- sum((data$Mortality-gam_mort4$fitted.values)^2)
+paste("SSE for best GAM fit:",round(sse,0))

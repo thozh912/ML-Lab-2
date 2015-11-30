@@ -16,7 +16,7 @@ We fit a piece-wise constant function to our data with knots at $x=3$ and $x=6$.
 
 ```{r,echo=FALSE,message=FALSE}
 
-data <- read.csv2("D:/R_HW/ML-Lab-2/data/cube.csv")
+data <- read.csv2("C:/Users/Dator/Documents/R_HW/ML-Lab-2/data/cube.csv")
 #head(data)
 
 piecew_const <- function(resp,input,knots){
@@ -126,4 +126,4 @@ We clearly see that the mortality is higher during the winter weeks compared to 
 ##Appendix
 
 ###R code
-```{r code=readLines(knitr::purl("D:/R_HW/ML-Lab-2/vignettes/ComputerLab7.Rmd", documentation = 0)), eval = FALSE}
+```{r code=readLines(knitr::purl("C:/Users/Dator/Documents/R_HW/ML-Lab-2/vignettes/ComputerLab7.Rmd", documentation = 0)), eval = FALSE}

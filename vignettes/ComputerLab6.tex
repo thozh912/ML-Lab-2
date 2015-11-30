@@ -1,0 +1,168 @@
+\documentclass[a4paper]{article}
+\usepackage[a4paper,width=150mm,top=25mm,bottom=25mm,bindingoffset=6mm]{geometry}
+
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage{listings}
+
+
+\title{732A52: Computer lab 6 \\
+ Introduction to machine learning}
+
+\author{Martina Sandberg
+\small
+\\IDA, Statistics and Data Mining
+\\Linköping University
+\\marsa505@student.liu.se}
+\begin{document}
+\maketitle
+\begin{center}
+--------------------------------------------------------------------------------\\
+\end{center}
+
+\section{Gaussian Processes}
+\textbf{This exercise is concerned with the Gaussian Process Regression:}\\
+
+\[ y=f(x) + \varepsilon \,\,\,\,\,\ \varepsilon\sim N(0.\sigma^2_n) \]
+
+\subsection{}
+\textbf{Write your own code for simulating from the posterior distribution of $f(x)$ using the squared exponential kernel. The function (name it \texttt{posteriorGP}) should return vectors with the posterior mean and variance of $f$, both evaluated at a set of x-values ($x*$). The function should have the following inputs: \texttt{x} (vector of training inputs), \texttt{y} (vector of training targets/outputs), \texttt{xStar} (vector of inputs where the posterior distribution is evaluated, i.e. $x*$), \texttt{hyperParam} (vector with two elements $\sigma_f$ and $l$), \texttt{sigmaNoise} ($\sigma_n$). }\\
+
+\begin{equation}
+ f(x) \sim GP(m(x),k(x,x')) 
+\end{equation}\\
+
+\begin{equation}
+k(x,x') = \sigma^2_f exp\left\{ -\frac{1}{2} \frac{||x-x'||^2}{l^2} \right\}
+\end{equation}\\
+
+\begin{equation}
+ f_* | x,y,x_* \sim N(\bar{f}_*, cov(f_*))
+\end{equation}\\
+
+\begin{equation}
+ \bar{f}_* = K(x_*,x) [K(x,x)+\sigma^2I]^{-1}y
+\end{equation}\\
+
+\begin{equation}
+ cov(f_*) = K(x_*,x_*) - K(x_*,x) [K(x,x)+\sigma^2I]^{-1} K(x,x_*)
+\end{equation}\\
+
+\noindent A gaussian process is denoted by (1), here we use $m(x)=0$ and the squared exponential kernel (2) where the hyperparameters are $\theta=(\sigma_f,l)^T$. $(l>0, \sigma_f>0)$. $l$ is the length scale, so larger $l$ gives more smoothness in $f(x)$. $x$ and $y$ are observed data and we choose a grid of x-values (x*). The posterior distribution of $f(x)$ (3) can now be computed as (4) and (5). Now we can use this posterior distribution to simulate draws from the prior $f(x) \sim GP(0,k(x,x'))$. The code for this simulation function can be seen in \textit{Appendix}.\\
+
+
+
+
+
+\subsection{}
+\textbf{Now let the prior hyperparameters be $\sigma_f=1,l=0.3$. Update this prior with a single observation: (x, y) = (0.4, 0.719). Assume that the noise standard deviation is known to be $\sigma_n=0.1$. Plot the posterior mean of $f$ over the interval $x \in [-1,1]$. Plot also 95\% probability (pointwise) bands for $f$.}\\
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{fig1.eps}
+\textit{\caption{\label{fig:1} Simulated posterior mean from \texttt{posteriorGP} with one observation and 95\% probability bands. }}
+\end{figure}
+
+
+
+\noindent When implementing the function with the observation (x, y) = (0.4, 0.719), prior hyperparameters $\sigma_f=1$ and $l=0.3$ and noise standard deviation $\sigma_n=0.1$, figure~\ref{fig:1} is obtained. Here the posterior mean of $f$ is plotted together with the 95\% probability bands for $f$.\\
+
+\subsection{}
+\textbf{Update your posterior from 1.2 with another observation: (x, y) =(-0.6,-0.044). Plot the posterior mean of $f$ over the interval $x \in [-1,1]$. Plot also 95\% probability bands for $f$. }
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{fig2.eps}
+\textit{\caption{\label{fig:2}  Simulated posterior mean from \texttt{posteriorGP} with two observations and 95\% probability bands. }}
+\end{figure}
+
+\noindent When using the same values as in 1.3 but including the observation  (x, y) =(-0.6,-0.044) the posterior mean of $f$ and the 95\% probability bands for $f$ is obtained as shown in  figure~\ref{fig:2}.\\
+
+\subsection{}
+\textbf{Compute the posterior distribution of $f$ using all 5 data points in table~\ref{tab:1}. Plot the posterior mean of $f$ over the interval $x \in [-1,1]$. Plot also 95\% probability intervals for $f$. }
+
+
+
+
+
+\begin{table}[H]
+\centering
+\begin{tabular}{| r | c |  c | c | c | c |}
+  \hline
+ x & -1.0& -0.6 & -0.2 & 0.4 & 0.8  \\ 
+  \hline
+ y & 0.768 & -0.044 & -0.940 & 0.719 & -0.664 \\ 
+   \hline
+\end{tabular}
+\textit{\caption{ \label{tab:1} Simple data set for GP regression.}}
+\end{table}
+
+
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{fig3.eps}
+\textit{\caption{\label{fig:3}  Simulated posterior mean from \texttt{posteriorGP} with five observations and 95\% probability bands. }}
+\end{figure}
+
+\noindent Now we implement the function with the observations in table~\ref{tab:1} and set all other values as in the previous part. The posterior mean of $f$ and the 95\% probability bands for $f$ from this implementation can be seen in figure~\ref{fig:3}.\\
+
+\subsection{}
+\textbf{Repeat 1.4, this time with the hyperparameters $\sigma_f=1,l=1$. Compare the results.}
+
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{fig4.eps}
+\textit{\caption{\label{fig:4}  Simulated posterior mean from \texttt{posteriorGP} with five observations and 95\% probability bands. }}
+\end{figure}
+
+
+\noindent If we now change the hyperparameters to $\sigma_f=1$ and $l=1$ we get figure~\ref{fig:4}. The only difference between the implemented functions in figure~\ref{fig:3} and figure~\ref{fig:4} is $l$ which is $0.3$ in figure~\ref{fig:3} and $1$ in figure~\ref{fig:4}. We can conclude that the probability bands is more narrow and straight in figure~\ref{fig:4} but also that the curve is smoother. This is expected as $l$ is a smoothing parameter.\\
+
+
+
+\section{}
+\textbf{Try out your brand new code from the previous problem on the \texttt{JapanTemp.dat} data set with \texttt{time} as covariate and \texttt{temp} as response variable. The data set contains a year of daily temperatures for some place in Japan. Document the effect on the posterior from changing $\sigma_n$ and the prior hyperparameters.}\\
+
+
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{sigmaf.eps}
+\textit{\caption{\label{fig:5}  Simulated posterior mean from \texttt{posteriorGP} with different values for $\sigma_f$ and all other constant.  }}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{l_l.eps}
+\textit{\caption{\label{fig:6}  Simulated posterior mean from \texttt{posteriorGP} with different values for $l$ and all other constant. }}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=1\textwidth]{sigma_n.eps}
+\textit{\caption{\label{fig:7}   Simulated posterior mean from \texttt{posteriorGP} with different values for $\sigma_n$ and all other constant.}}
+\end{figure}
+
+
+\noindent Now we use the function on the data \textbf{JapanTemp}. The effect on the posterior by changing the hyperparameter $\sigma_f$ and keeping the other parameters ($\sigma_n$ and $l$) constant at 1 can be seen in figure~\ref{fig:5}. The effect on the posterior by changing the hyperparameter $l$ and keeping the other parameters ($\sigma_n$ and $\sigma_f$) constant at 1 can be seen in figure~\ref{fig:6}. The effect on the posterior by changing the parameter $\sigma_n$ and keeping the other parameters ($l$ and $\sigma_f$) constant at 1 can be seen in figure~\ref{fig:7}.\\
+
+
+
+
+
+
+\end{document}
+
