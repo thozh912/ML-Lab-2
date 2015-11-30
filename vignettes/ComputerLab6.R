@@ -1,6 +1,6 @@
 library(MASS)
 
-www = "C:/Users/Dator/Documents/R_HW/ML-Lab-2/data/JapanTemp.dat"
+www = "D:/R_HW/ML-Lab-2/data/JapanTemp.dat"
 data <- read.delim(www, header = TRUE, sep="")
 
 Kernel <- function(x_0,x,lambda,sigmaf){

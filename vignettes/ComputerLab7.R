@@ -78,4 +78,44 @@ lines(gam_mort$fitted.values,col="red")
 summary(gam_mort)
 
 plot(gam_mort, main="Week spline component over a year")
+gam_mort2 <- gam(formula=Mortality ~ Year + s(Week, k=3), data=data) 
+gam_mort3 <- gam(formula=Mortality ~ Year + s(Week, k=20), data=data) 
+
+
+
+plot(data$Mortality,type="l",
+     main=c("Weekly Mortality in Sweden vs year with GAM fit",
+     "week spline function space has dimension 3"),
+     xlab="# weeks after week 52 1994",ylab="Mortality")
+lines(gam_mort2$fitted.values, col="red") 
+paste("Deviance explained by fit, Week spline basis dimension 3:",61.6,"%")
+plot(data$Mortality,type="l",
+     main=c("Weekly Mortality in Sweden vs year with GAM fit",
+            "week spline function space has dimension 20"),
+     xlab="# weeks after week 52 1994",ylab="Mortality")
+lines(gam_mort3$fitted.values, col="red") 
+paste("Deviance explained by fit, Week spline basis dimension 20:",68.8,"%")
+plot(data$Time,data$Influenza,ylim=c(-250,600),
+     main="Weekly influenza and residuals of mortality GAM fit",
+     xlab="year")
+points(data$Time,gam_mort$residuals,col="red")
+legend("topleft",legend=c("influenza cases","Residual of GAM fit"),
+       pch=c("o","o"),col=c("black","red"))
+
+gam_mort4 <- gam(formula=Mortality ~ s(Week, k=5) + s(Influenza, k=4), data=data)
+summary(gam_mort4)
+par(mfrow=c(1,2)) 
+plot(gam_mort4) 
+par(mfrow=c(1,1)) 
+
+
+
+plot(data$Mortality,type="l",
+     main=c("Weekly Mortality in Sweden vs year with GAM fit",
+            "spline functions of week, year and influenza cases"),
+     xlab="# weeks after week 52 1994",ylab="Mortality")
+lines(gam_mort4$fitted.values, col="red") 
+paste("Deviance explained by this fit:",70.9,"%")
+sse <- sum((data$Mortality-gam_mort4$fitted.values)^2)
+paste("SSE for best GAM fit:",round(sse,0))
 ## NA

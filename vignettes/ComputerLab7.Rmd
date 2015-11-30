@@ -16,7 +16,7 @@ We fit a piece-wise constant function to our data with knots at $x=3$ and $x=6$.
 
 ```{r,echo=FALSE,message=FALSE}
 
-data <- read.csv2("C:/Users/Dator/Documents/R_HW/ML-Lab-2/data/cube.csv")
+data <- read.csv2("D:/R_HW/ML-Lab-2/data/cube.csv")
 #head(data)
 
 piecew_const <- function(resp,input,knots){
@@ -96,7 +96,7 @@ acf(mort_data_ts,
 
 ```
 
-We clearly see that both Mortality and Influenza cases are highly autocorrelated, both with nearby data points and with a seasonal trend. We try to create a GAM model in R where Mortality depends on a linear term in Year and a spline term in Week, that is we say that
+We clearly see that both Mortality and Influenza cases are highly autocorrelated, both with nearby data points and with a seasonal trend. We try to create a GAM in R where Mortality depends on a linear term in Year and a spline term in Week, that is we say that
 
 $$Mortality = \beta_{year}X_{year} + s(X_{week}) + \varepsilon$$
 
@@ -115,15 +115,74 @@ summary(gam_mort)
 
 ```
 
-The fitted value of this GAM model looks, ok. It looks as if the Year coefficient is not significant, while the smooth spline term is highly significant. Let us plot the smooth spline function over all weeks. 
+The fitted value of this GAM looks, ok. It looks as if the Year coefficient is not significant, while the smooth spline term is highly significant. Let us plot the smooth spline function over all weeks. 
 
 ```{r,echo=FALSE}
 plot(gam_mort, main="Week spline component over a year")
 ```
 
-We clearly see that the mortality is higher during the winter weeks compared to mortality during the summer. In seems this accounts for the seasonal pattern in the GAM model.
+We clearly see that the mortality is higher during the winter weeks compared to mortality during the summer. In seems this accounts for the seasonal pattern in the GAM.
+
+Let us try to vary the number of dimensions of the basis of the spline term and see how that affects the deviance explained by the model and the fitted model itself.
+
+```{r,echo=FALSE}
+gam_mort2 <- gam(formula=Mortality ~ Year + s(Week, k=3), data=data) 
+gam_mort3 <- gam(formula=Mortality ~ Year + s(Week, k=20), data=data) 
+
+
+
+plot(data$Mortality,type="l",
+     main=c("Weekly Mortality in Sweden vs year with GAM fit",
+     "week spline function space has dimension 3"),
+     xlab="# weeks after week 52 1994",ylab="Mortality")
+lines(gam_mort2$fitted.values, col="red") 
+paste("Deviance explained by fit, Week spline basis dimension 3:",61.6,"%")
+plot(data$Mortality,type="l",
+     main=c("Weekly Mortality in Sweden vs year with GAM fit",
+            "week spline function space has dimension 20"),
+     xlab="# weeks after week 52 1994",ylab="Mortality")
+lines(gam_mort3$fitted.values, col="red") 
+paste("Deviance explained by fit, Week spline basis dimension 20:",68.8,"%")
+```
+
+It seems as if increasing the number of basis dimensions for the spline term leads to more overfitting models and a larger part of the deviance explained. I infer that the penalty factor is decreased for higher values of $k$, the number of basis dimensions for the spline term, and hence higher degrees of freedom.
+
+A plot between residuals of our first GAM and the weekly mortality rate is next shown below:
+
+```{r,echo=FALSE}
+plot(data$Time,data$Influenza,ylim=c(-250,600),
+     main="Weekly influenza and residuals of mortality GAM fit",
+     xlab="year")
+points(data$Time,gam_mort$residuals,col="red")
+legend("topleft",legend=c("influenza cases","Residual of GAM fit"),
+       pch=c("o","o"),col=c("black","red"))
+
+```
+
+We note that although the residuals appear random, during the influenza spires of year 1996, 1999 and year 2000 the residuals were highly skewed to the positive during the same weeks. This could suggest that influenza cases could be a predictor for mortality rate. We try to make a GAM which takes this suggestion into account, as well as discarding the non-significant year predictor.
+
+```{r,echo=FALSE}
+gam_mort4 <- gam(formula=Mortality ~ s(Week, k=5) + s(Influenza, k=4), data=data)
+summary(gam_mort4)
+par(mfrow=c(1,2)) 
+plot(gam_mort4) 
+par(mfrow=c(1,1)) 
+
+
+
+plot(data$Mortality,type="l",
+     main=c("Weekly Mortality in Sweden vs year with GAM fit",
+            "spline functions of week, year and influenza cases"),
+     xlab="# weeks after week 52 1994",ylab="Mortality")
+lines(gam_mort4$fitted.values, col="red") 
+paste("Deviance explained by this fit:",70.9,"%")
+sse <- sum((data$Mortality-gam_mort4$fitted.values)^2)
+paste("SSE for best GAM fit:",round(sse,0))
+```
+
+It is seen that this model is better, compared to the previous ones. Deviance explained is higher and the plot looks nicer. The spline terms are both significant. It seems as if the mortality rate is influenced by the out breaks of influenza, even though the influenza spline term experiences high uncertainty for large numbers of influenza cases. This uncertainty could be adressed by more data of influenza outbreaks.
 
 ##Appendix
 
 ###R code
-```{r code=readLines(knitr::purl("C:/Users/Dator/Documents/R_HW/ML-Lab-2/vignettes/ComputerLab7.Rmd", documentation = 0)), eval = FALSE}
+```{r code=readLines(knitr::purl("D:/R_HW/ML-Lab-2/vignettes/ComputerLab7.Rmd", documentation = 0)), eval = FALSE}

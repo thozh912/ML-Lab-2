@@ -20,7 +20,7 @@ We create a function for simulating from the posterior distribution of $f(x)$ us
 ```{r,echo=FALSE,message=FALSE}
 library(MASS)
 
-www = "C:/Users/Dator/Documents/R_HW/ML-Lab-2/data/JapanTemp.dat"
+www = "D:/R_HW/ML-Lab-2/data/JapanTemp.dat"
 data <- read.delim(www, header = TRUE, sep="")
 
 Kernel <- function(x_0,x,lambda,sigmaf){
@@ -86,19 +86,6 @@ We see that the probability bands become narrow around the observations. This is
 
 We now compute the posterior distribution for five points, given in the lab instructions. Let us do it one time for $\lambda = 0.3$ and one time for $\lambda = 1$.
 
-$$
-\begin{table}[H]
-\centering
-\begin{tabular}{| r | c |  c | c | c | c |}
-  \hline
- x & -1.0& -0.6 & -0.2 & 0.4 & 0.8  \\ 
-  \hline
- y & 0.768 & -0.044 & -0.940 & 0.719 & -0.664 \\ 
-   \hline
-\end{tabular}
-\textit{\caption{ \label{tab:1} Simple data set for GP regression.}}
-\end{table}
-$$
 
 ```{r,echo=FALSE}
 yvec <- c(0.768,-0.044,-0.940,0.719,-0.664)
@@ -195,4 +182,4 @@ When $\sigma^2_{n}$ is increased, a less precise fit is obtained, since it is th
 ##Appendix
 
 ###R code
-```{r code=readLines(knitr::purl("C:/Users/Dator/Documents/R_HW/ML-Lab-2/vignettes/ComputerLab6.Rmd", documentation = 0)), eval = FALSE}
+```{r code=readLines(knitr::purl("D:/R_HW/ML-Lab-2/vignettes/ComputerLab6.Rmd", documentation = 0)), eval = FALSE}
